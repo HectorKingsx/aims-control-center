@@ -23,6 +23,7 @@ const NAV: NavGroup[] = [
     items: [
       { label: "Founder Approval", href: "/approval" },
       { label: "Content Pipeline", href: "/pipeline" },
+      { label: "Content Review", href: "/content-review" },
       { label: "Topics", href: "/topics", placeholder: true },
       { label: "Editorial Quality", href: "/quality" },
     ],
