@@ -10,11 +10,22 @@ import QcChecklist from "./QcChecklist";
 
 interface CarouselDraft {
   hooks: unknown;
-  slides: { title?: string; text?: string; bullets?: string[] }[] | null;
+  slides: {
+    title?: string;
+    text?: string;
+    bullets?: { icon?: string; text?: string; highlight?: string | null }[];
+    stat_highlight?: { label?: string; value?: string } | null;
+  }[] | null;
   caption: string | null;
   cta: string | null;
   source_note: string | null;
   needs_revision_note: string | null;
+}
+
+interface ProductionRow {
+  image_urls: string[] | null;
+  bundle_url: string | null;
+  status: string | null;
 }
 
 const SCORE_FIELDS: { key: keyof ContentOverviewRow; label: string; mock: boolean }[] = [
@@ -57,11 +68,23 @@ function ApprovalDetailInner() {
     [id]
   );
 
+  const production = useSupabaseQuery<ProductionRow[]>(
+    () =>
+      supabase
+        .schema("s8")
+        .from("content_production")
+        .select("image_urls, bundle_url, status")
+        .eq("content_item_id", id) as unknown as PromiseLike<{ data: ProductionRow[] | null; error: { message: string } | null }>,
+    [id]
+  );
+
   if (loading) return <LoadingState />;
   if (error) return <ErrorState text={error} />;
   const row = data?.[0];
   if (!row) return <ErrorState text="Konten tidak ditemukan" />;
   const cd = draft.data?.[0];
+  const prod = production.data?.[0];
+  const renderedImages = prod?.image_urls ?? [];
 
   async function handleAction(action: FounderAction) {
     if (action === "revise" && !showRevisionForm) {
@@ -120,13 +143,43 @@ function ApprovalDetailInner() {
           <p className="text-sm text-base-muted">Draft carousel belum tersedia untuk item ini.</p>
         ) : (
           <div className="space-y-4">
-            {cd.slides && cd.slides.length > 0 && (
+            {renderedImages.length > 0 ? (
+              <div>
+                <div className="text-[11px] text-base-muted mb-2">
+                  Gambar hasil render S8 ({renderedImages.length} slide)
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  {renderedImages.map((url, i) => (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <a key={i} href={url} target="_blank" rel="noreferrer" className="block border border-base-border rounded-lg overflow-hidden bg-base-panel2/40 hover:border-accent/50">
+                      <img src={url} alt={`Slide ${i + 1}`} className="w-full aspect-[4/5] object-cover" loading="lazy" />
+                      <div className="text-[10px] text-base-muted text-center py-1">Slide {i + 1}</div>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            ) : production.loading ? (
+              <LoadingState />
+            ) : (
+              <p className="text-sm text-status-yellow">
+                Gambar hasil render belum tersedia (S8 belum selesai atau gagal untuk item ini). Preview teks di bawah dari draft S5:
+              </p>
+            )}
+            {renderedImages.length === 0 && cd.slides && cd.slides.length > 0 && (
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 {cd.slides.map((s, i) => (
-                  <div key={i} className="border border-base-border rounded-lg p-3 bg-base-panel2/40 aspect-[4/5] flex flex-col">
+                  <div key={i} className="border border-base-border rounded-lg p-3 bg-base-panel2/40 aspect-[4/5] flex flex-col overflow-y-auto">
                     <div className="text-[10px] text-base-muted mb-1">Slide {i + 1}</div>
-                    <div className="text-xs font-semibold mb-1 line-clamp-2">{s.title ?? ""}</div>
-                    <div className="text-[11px] text-base-muted line-clamp-6">{s.text ?? (s.bullets ?? []).join(" · ")}</div>
+                    <div className="text-xs font-semibold mb-1">{s.title ?? ""}</div>
+                    {s.stat_highlight?.value && (
+                      <div className="text-sm font-bold text-accent mb-1">{s.stat_highlight.value}</div>
+                    )}
+                    {s.text && <div className="text-[11px] text-base-muted mb-1">{s.text}</div>}
+                    {(s.bullets ?? []).map((b, bi) => (
+                      <div key={bi} className="text-[10px] text-base-muted mb-1">
+                        • {b.text ?? ""}
+                      </div>
+                    ))}
                   </div>
                 ))}
               </div>
