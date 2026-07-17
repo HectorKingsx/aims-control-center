@@ -199,7 +199,7 @@ function ApprovalDetailInner() {
                   <p className="text-xs text-base-muted">{cd.source_note ?? "-"}</p>
                 </div>
                 {row.bundle_url && (
-                  <a href={row.bundle_url} target="_blank" rel="noreferrer" className="inline-block text-xs px-3 py-1.5 rounded-lg bg-accent text-white">
+                  <a href={row.bundle_url} target="_blank" rel="noreferrer" className="inline-block text-xs px-3 py-1.5 rounded-lg bg-accent text-black">
                     Download file final
                   </a>
                 )}

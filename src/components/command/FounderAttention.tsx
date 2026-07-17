@@ -124,7 +124,7 @@ export default function FounderAttention() {
                 <div className="text-sm font-medium truncate">{a.related}</div>
                 <div className="text-xs text-base-muted truncate">{a.reason}</div>
               </div>
-              <Link href={a.href} className="shrink-0 text-xs px-3 py-1.5 rounded-lg bg-accent text-white font-medium hover:bg-accent/90">
+              <Link href={a.href} className="shrink-0 text-xs px-3 py-1.5 rounded-lg bg-accent text-black font-medium hover:bg-accent/90">
                 {a.action}
               </Link>
             </div>

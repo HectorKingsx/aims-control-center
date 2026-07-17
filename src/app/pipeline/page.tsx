@@ -77,8 +77,8 @@ function PipelineContent() {
             <option value="HIGH">Risk tinggi</option>
           </select>
           <div className="flex border border-base-border rounded-lg overflow-hidden">
-            <button onClick={() => setView("kanban")} className={`px-3 py-2 text-sm ${view === "kanban" ? "bg-accent text-white" : "bg-base-panel2"}`}>Kanban</button>
-            <button onClick={() => setView("table")} className={`px-3 py-2 text-sm ${view === "table" ? "bg-accent text-white" : "bg-base-panel2"}`}>Table</button>
+            <button onClick={() => setView("kanban")} className={`px-3 py-2 text-sm ${view === "kanban" ? "bg-accent text-black" : "bg-base-panel2"}`}>Kanban</button>
+            <button onClick={() => setView("table")} className={`px-3 py-2 text-sm ${view === "table" ? "bg-accent text-black" : "bg-base-panel2"}`}>Table</button>
           </div>
         </div>
       </div>

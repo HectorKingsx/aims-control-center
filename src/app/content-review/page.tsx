@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import { useSupabaseQuery, supabase } from "@/hooks/useSupabaseQuery";
 import { Card, Badge, EmptyState, LoadingState, ErrorState, fmtRelativeAge } from "@/components/ui";
 import Link from "next/link";
+import ContentPreviewModal from "@/components/ContentPreviewModal";
 
 interface ReviewRow {
   content_item_id: string;
@@ -19,6 +20,7 @@ export default function ContentReviewPage() {
   const [search, setSearch] = useState("");
   const [busyId, setBusyId] = useState<string | null>(null);
   const [localApproved, setLocalApproved] = useState<Set<string>>(new Set());
+  const [previewItem, setPreviewItem] = useState<{ id: string; title: string } | null>(null);
 
   interface ContentItemRow {
     id: string; title: string | null; status: string | null; founder_decision: string | null;
@@ -135,7 +137,10 @@ export default function ContentReviewPage() {
             const isApproved = r.founder_decision === "approved_for_manual_publish" || localApproved.has(r.content_item_id);
             return (
               <div key={r.content_item_id} className="border border-base-border rounded-xl overflow-hidden bg-base-panel">
-                <Link href={`/approval/detail?id=${r.content_item_id}`} className="block">
+                <button
+                  onClick={() => setPreviewItem({ id: r.content_item_id, title: r.title ?? "(tanpa judul)" })}
+                  className="block w-full text-left"
+                >
                   <div className="aspect-square bg-base-panel2 relative">
                     {cover ? (
                       // eslint-disable-next-line @next/next/no-img-element
@@ -151,11 +156,11 @@ export default function ContentReviewPage() {
                       </div>
                     )}
                   </div>
-                </Link>
+                </button>
                 <div className="p-3">
-                  <Link href={`/approval/detail?id=${r.content_item_id}`}>
+                  <button onClick={() => setPreviewItem({ id: r.content_item_id, title: r.title ?? "(tanpa judul)" })} className="text-left w-full">
                     <div className="text-sm font-medium line-clamp-2 mb-1 hover:text-accent">{r.title ?? "(tanpa judul)"}</div>
-                  </Link>
+                  </button>
                   <div className="flex items-center justify-between text-[11px] text-base-muted mb-2">
                     <span>{r.slide_count ?? r.image_urls?.length ?? "-"} slide</span>
                     <span>{fmtRelativeAge(r.updated_at)}</span>
@@ -164,7 +169,7 @@ export default function ContentReviewPage() {
                     disabled={busyId === r.content_item_id || isApproved}
                     onClick={() => handleApproveForManualPublish(r.content_item_id)}
                     className={`w-full text-xs px-3 py-2 rounded-lg font-medium disabled:opacity-50 ${
-                      isApproved ? "bg-status-green/20 text-status-green" : "bg-accent text-white hover:bg-accent/90"
+                      isApproved ? "bg-status-green/20 text-status-green" : "bg-accent text-black hover:bg-accent/90"
                     }`}
                   >
                     {isApproved ? "Disetujui untuk upload" : "Approve untuk upload"}
@@ -180,6 +185,14 @@ export default function ContentReviewPage() {
         Tombol ini menandai konten sebagai sudah ditinjau dan siap diupload manual oleh Vincent ke Instagram —
         tidak memicu publish otomatis apa pun (S9 belum aktif). Keputusan tercatat di s7.review_actions.
       </p>
+
+      {previewItem && (
+        <ContentPreviewModal
+          contentItemId={previewItem.id}
+          title={previewItem.title}
+          onClose={() => setPreviewItem(null)}
+        />
+      )}
     </div>
   );
 }

@@ -56,7 +56,7 @@ export default function Sidebar() {
     <aside className="w-64 shrink-0 h-screen sticky top-0 flex flex-col border-r border-base-border bg-base-panel">
       <div className="px-5 py-5 border-b border-base-border">
         <div className="flex items-center gap-2">
-          <div className="h-8 w-8 rounded-lg bg-accent flex items-center justify-center font-bold text-white text-sm">
+          <div className="h-8 w-8 rounded-lg bg-accent flex items-center justify-center font-bold text-black text-sm">
             A
           </div>
           <div>
